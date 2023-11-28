@@ -12,34 +12,34 @@
 
 void *clientHandler(void *socket) {
 ///// Receive packets from the client
+    packet_t packet;
     int conn_fd = *(int *) socket;
     int bytes_read;
-    char buffer[BUFFER_SIZE];
-    bzero(buffer, BUFFER_SIZE);
-    recv(conn_fd, buffer, BUFFER_SIZE, 0);
-    
-    while((bytes_read = recv(conn_fd, buffer, BUFFER_SIZE, 0)) >= 0) {
 
+    bytes_read = recv(conn_fd, &packet, BUFFER_SIZE, 0);
+    if(bytes_read <= 0)
+        perror("recv error");
 
-    }
-        // typedef struct packet {
-        //     unsigned char operation : 4;
-        //     unsigned char flags : 4;
-        //     unsigned int size;
-        //     unsigned char checksum[SHA256_BLOCK_SIZE];
-        // } packet_t; 
+    // typedef struct packet {
+    //     unsigned char operation : 4;
+    //     unsigned char flags : 4;
+    //     unsigned int size;
+    //     unsigned char checksum[SHA256_BLOCK_SIZE];
+    // } packet_t; 
+
 ///// Determine the packet operatation and flags
 
 ///// Receive the image data using the size
 
-///// Process the image data based on the set of flags
+///// Process the image data based on the set of flags - ROTATE THE IMAGE
+
+///// Acknowledge the request and return the processed image data
 
     // typedef struct processing_args {
     //     int number_worker;
     //     char *file_name;
     // } processing_args_t;
 
-///// Acknowledge the request and return the processed image data
 }
 
 int main(int argc, char* argv[]) {

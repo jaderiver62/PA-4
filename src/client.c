@@ -14,15 +14,17 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024 
 
-int queue_size = 0;
+int queue_size = 0; // Or index of the queue
 
 int send_file(int socket, const char *filename) {
-    // Open the file
+///// Open the file
     FILE* fileptr = fopen(filename, "r");
-    // Set up the request packet for the server and send it
+    
+///// Set up the request packet for the server and send it
     char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
-    // Send the file data
+
+///// Send the file data
     while(fgets(buffer, BUFFER_SIZE, fileptr) != NULL){
         send(socket, buffer, BUFFER_SIZE, 0);
     }
@@ -33,12 +35,14 @@ int send_file(int socket, const char *filename) {
 }
 
 int receive_file(int socket, const char *filename) {
-    // Open the file
+///// Open the file
     FILE* fileptr = fopen(filename, "w");
-    // Receive response packet
+
+///// Receive response packet
     char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
-    // Receive the file data
+
+///// Receive the file data
     while(recv(socket, buffer, BUFFER_SIZE, 0) > 0){
         // Write the data to the file
         fputs(buffer, fileptr);
@@ -50,7 +54,6 @@ int receive_file(int socket, const char *filename) {
 }
 
 int main(int argc, char* argv[]) {
-
     if(argc != 3){
         fprintf(stderr, "Usage: ./client File_Path_to_images File_Path_to_output_dir Rotation_angle. \n");
         return 1;
@@ -152,6 +155,7 @@ int main(int argc, char* argv[]) {
 
 ///// Terminate the connection once all images have been processed
     close(sockfd);
+    
 ///// Release any resources
     closedir(dir);
 
