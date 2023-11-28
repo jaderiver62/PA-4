@@ -50,6 +50,7 @@ int receive_file(int socket, const char *filename) {
 }
 
 int main(int argc, char* argv[]) {
+
     if(argc != 3){
         fprintf(stderr, "Usage: ./client File_Path_to_images File_Path_to_output_dir Rotation_angle. \n");
         return 1;
@@ -93,6 +94,7 @@ int main(int argc, char* argv[]) {
     }
 
 ///// Send the image data to the server
+    // While request_queue is not empty
     while(queue_size > 0){
         // Pop a file from the queue
         request_t request = request_queue[queue_size - 1];
@@ -142,12 +144,7 @@ int main(int argc, char* argv[]) {
 
     }
 
-    // While request queue is not empty
-        // Pop a file from the queue
-        // Receive the processed image and save it in the output dir
-            // Receive the response packet containing the processed image from the server
-            // Save the image to the output directory
-    // While request queue is empty
+    // When request_queue is empty
     // Send ‘terminate’ message through socket using the IMG_OP_EXIT operation
     if (send(sockfd, IMG_OP_EXIT, strlen(IMG_OP_EXIT), 0) == INVALID) {
         perror("terminate error");
