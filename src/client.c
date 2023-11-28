@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
     // Set up socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(sockfd == -1)
+    if(sockfd == INVALID)
         perror("socket error");
 
     // Connect the socket
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     int ret = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
     
     // Check that the request was acknowledged
-    if(ret == -1)
+    if(ret == INVALID)
         perror("connect error");
 
     // Read the directory for all the images to rotate
@@ -121,11 +121,11 @@ int main(int argc, char* argv[]) {
         // Check that the response packet is valid
         if(response.operation == IMG_OP_ACK){
             // Receive the processed image data
-            receive_file(sockfd, output_dir);
+            receive_file(sockfd, entry->d_name);
         }
         else if(response.operation == IMG_OP_NAK){
             // Log the error
-            FILE* fileptr = fopen("request_log", "w");
+            FILE* fileptr = fopen(LOG_FILE_NAME, "w");
             fprintf(fileptr, "Error: %s\n", strerror(errno));
             fclose(fileptr);
         }

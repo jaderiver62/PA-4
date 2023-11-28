@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
     int listen_fd, conn_fd;
 
     listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if(listen_fd == -1)
+    if(listen_fd == INVALID)
         perror("socket error");
 
     struct sockaddr_in servaddr;
@@ -40,12 +40,12 @@ int main(int argc, char* argv[]) {
 
     // Bind the socket to the port
     int ret = bind(listen_fd, (struct sockaddr *) &servaddr, sizeof(servaddr));
-    if(ret == -1)
+    if(ret == INVALID)
         perror("bind error");
 
     // Listen on the socket
     ret = listen(listen_fd, MAX_CLIENTS);
-    if(ret == -1)
+    if(ret == INVALID)
         perror("listen error");
 
     // Accept connections and create the client handling threads
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     // conn_fd = accept(listen_fd, (struct sockaddr *) &clientaddr, &clientaddr_len);
     // if(conn_fd == -1)
     //     perror("accept error");
-    
+
     // typedef struct processing_args {
     //     int number_worker;
     //     char *file_name;
