@@ -1,8 +1,3 @@
-// TODO: 
-// Send a package with IMG_OP_ROTATE to the server and receive the package on the server side
-// Utilize the request queue to send the images to the server
-// Used labs as a reference for the client code
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -58,14 +53,6 @@ int main(int argc, char* argv[]) {
     char* output_dir = argv[2];
     int rotation_angle = atoi(argv[3]);
 
-    // typedef struct request_queue {
-    //     int rotation_angle;
-    //     char *file_name;
-    // } request_t; 
-
-    // Create a request queue
-    // request_t request_queue[MAX_QUEUE_LEN];
-
     // Set up socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(sockfd == INVALID)
@@ -89,12 +76,10 @@ int main(int argc, char* argv[]) {
 
     // While there are files in the directory
     while((entry = readdir(dir)) != NULL){
-        // Add to the request queue using the request_t struct-> rotation angle and file name
-        // request_queue->rotation_angle = rotation_angle;
-        // request_queue->file_name = entry->d_name;
-            // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
+        // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
         packet_t packet;
         packet.operation = IMG_OP_ROTATE;
+
         // Find IMG_FLAG_ROTATE_XXX using the rotation angle
         if(rotation_angle == 180){
             packet.flags = IMG_FLAG_ROTATE_180;
@@ -106,6 +91,7 @@ int main(int argc, char* argv[]) {
             packet.flags = 0;
         }
         packet.size = sizeof(request_t);
+
         // packet.checksum???
 
         // Send the packet   
@@ -132,14 +118,13 @@ int main(int argc, char* argv[]) {
 
     }
 
+    // Send ‘terminate’ message through socket using IMG_OP_EXIT
+    packet_t terminate;
+    terminate.operation = IMG_OP_EXIT;
+    terminate.flags = 0;
+    terminate.size = 0;
+    send(sockfd, &terminate, sizeof(terminate), 0);
 
-    // While request queue is not empty
-        // Pop a file from the queue
-        // Receive the processed image and save it in the output dir
-            // Receive the response packet containing the processed image from the server
-            // Save the image to the output directory
-    // While request queue is empty
-    // Send ‘terminate’ message through socket
     // Terminate the connection once all images have been processed
     close(sockfd);
     // Release any resources
