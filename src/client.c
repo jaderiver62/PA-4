@@ -106,9 +106,11 @@ int main(int argc, char* argv[]) {
     // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
     packet_t packet;
     packet.operation = IMG_OP_ROTATE;
-    packet.flags = IMG_FLAG_ROTATE_180;
+    packet.flags = IMG_FLAG_ROTATE_180; // TODO: Change this to the correct flag using the rotation angle
     packet.size = sizeof(request_t);
-    // packet.checksum?????????????
+    // packet.checksum???
+    // Indicates that the packet contains a checksum for the image
+    // The checksum will be a 32 bytes Char digest of the image data
 
     // Send the packet   
     send(sockfd, &packet, sizeof(packet), 0);
