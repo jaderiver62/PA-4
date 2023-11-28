@@ -66,31 +66,39 @@ int main(int argc, char* argv[]) {
     servaddr.sin_port = htons(PORT);
 
     int ret = connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+    
+    // Check that the request was acknowledged
     if(ret == -1)
         perror("connect error");
+
     // Read the directory for all the images to rotate
     DIR* dir = opendir(argv[1]);
     struct dirent* entry;
-    // Check that the request was acknowledged
+
+
+    // While there are files in the directory
     while((entry = readdir(dir)) != NULL){
-        // Put the files into the request queue along with rotation angle
+        // Add to the request queue along with rotation angle
 
     }
-    // While the queue is not empty
-    // Pop a file from the queue
-    // Send a packet with the IMG_FLAG_ROTATE_XXX message header, desired rotation Angle, Image size, and data.
 
-    // send_file(sockfd, entry->d_name);
+    // While request queue is not empty
+        // Pop a file from the queue
+        // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
 
-    // Receive the response packet containing the processed image from the server.
+    // Receive the processed image and save it in the output dir
+        // Receive the response packet containing the processed image from the server
+        // Save the image to the output directory
     int ret = receive_file(sockfd, argv[2]);
     if(ret == -1)
         perror("receive error");
-    // Save the image to a specified directory (e.g., 'output').
-
-    // When queue is empty
-    // Terminate the connection once all images have been processed
+    
+    // While request queue is empty
     // Send ‘terminate’ message through socket.
+    // Close the socket
+
+
+    // Terminate the connection once all images have been processed
     close(sockfd);
     // Release any resources
     closedir(dir);
