@@ -13,10 +13,21 @@
 void *clientHandler(void *socket) {
 ///// Receive packets from the client
     int conn_fd = *(int *) socket;
+    int bytes_read;
     char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
     recv(conn_fd, buffer, BUFFER_SIZE, 0);
     
+    while((bytes_read = recv(conn_fd, buffer, BUFFER_SIZE, 0)) >= 0) {
+
+
+    }
+        // typedef struct packet {
+        //     unsigned char operation : 4;
+        //     unsigned char flags : 4;
+        //     unsigned int size;
+        //     unsigned char checksum[SHA256_BLOCK_SIZE];
+        // } packet_t; 
 ///// Determine the packet operatation and flags
 
 ///// Receive the image data using the size
@@ -67,12 +78,13 @@ int main(int argc, char* argv[]) {
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, clientHandler, (void *) &conn_fd);
 
-// ● Close connection when client terminates the session.
-// ○ Close the Connection: After receiving IMG_OP_EXIT operation
-// message from client, close the connection and clean up resources.
+///// After receiving IMG_OP_EXIT operation message from client, close the connection and clean up resources.
 
 
 ///// Release any resources
+    close(listen_fd);
+    close(conn_fd);
+
 
     return 0;
 }
