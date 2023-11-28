@@ -85,10 +85,9 @@ int main(int argc, char* argv[]) {
     // While request queue is not empty
         // Pop a file from the queue
         // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
-
-    // Receive the processed image and save it in the output dir
-        // Receive the response packet containing the processed image from the server
-        // Save the image to the output directory
+        // Receive the processed image and save it in the output dir
+            // Receive the response packet containing the processed image from the server
+            // Save the image to the output directory
     int ret = receive_file(sockfd, argv[2]);
     if(ret == -1)
         perror("receive error");
