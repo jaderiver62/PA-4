@@ -14,6 +14,8 @@
 #define PORT 8080
 #define BUFFER_SIZE 1024 
 
+int queue_size = 0;
+
 int send_file(int socket, const char *filename) {
     // Open the file
     FILE* fileptr = fopen(filename, "r");
@@ -58,11 +60,6 @@ int main(int argc, char* argv[]) {
     char* output_dir = argv[2];
     int rotation_angle = atoi(argv[3]);
 
-    // typedef struct request_queue {
-    //     int rotation_angle;
-    //     char *file_name;
-    // } request_t; 
-
     // Create a request queue
     request_t request_queue[MAX_QUEUE_LEN];
 
@@ -92,9 +89,12 @@ int main(int argc, char* argv[]) {
         // Add to the request queue using the request_t struct-> rotation angle and file name
         request_queue->rotation_angle = rotation_angle;
         request_queue->file_name = entry->d_name;
-            // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
+    }
+    while(queue_size > 0){
+        // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
         packet_t packet;
         packet.operation = IMG_OP_ROTATE;
+
         // Find IMG_FLAG_ROTATE_XXX using the rotation angle
         if(rotation_angle == 180){
             packet.flags = IMG_FLAG_ROTATE_180;
@@ -134,7 +134,6 @@ int main(int argc, char* argv[]) {
         }
 
     }
-
 
     // While request queue is not empty
         // Pop a file from the queue
