@@ -89,33 +89,39 @@ int main(int argc, char* argv[]) {
         // Add to the request queue using the request_t struct-> rotation angle and file name
         request_queue->rotation_angle = rotation_angle;
         request_queue->file_name = entry->d_name;
+        queue_size++;
     }
+
     while(queue_size > 0){
+        // Pop a file from the queue
+        request_t request = request_queue[queue_size - 1];
+        queue_size--;
+        
         // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
         packet_t packet;
         packet.operation = IMG_OP_ROTATE;
 
         // Find IMG_FLAG_ROTATE_XXX using the rotation angle
-        if(rotation_angle == 180){
+        if(request.rotation_angle == 180){
             packet.flags = IMG_FLAG_ROTATE_180;
         }
-        else if(rotation_angle == 270){
+        else if(request.rotation_angle == 270){
             packet.flags = IMG_FLAG_ROTATE_270;
         }
         else{
             packet.flags = 0;
         }
-        packet.size = sizeof(request_t);
+        packet.size = sizeof(request);
         // packet.checksum???
 
         // Send the packet   
         send(sockfd, &packet, sizeof(packet), 0);
 
         // Send the image file
-        char* done_img = strcat(output_dir, request_queue->file_name);
+        char* done_img = strcat(output_dir, request.file_name);
 
         // Send the file
-        send_file(sockfd, request_queue->file_name);
+        send_file(sockfd, request.file_name);
 
         // Receive the response packet
         packet_t response;
