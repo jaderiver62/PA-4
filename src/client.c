@@ -3,9 +3,6 @@
 // Utilize the request queue to send the images to the server
 // Used labs as a reference for the client code
 
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -93,24 +90,27 @@ int main(int argc, char* argv[]) {
     // While there are files in the directory
     while((entry = readdir(dir)) != NULL){
         // Add to the request queue using the request_t struct-> rotation angle and file name
-        // request_queue->rotation_angle = atoi(argv[3]);
+        // request_queue->rotation_angle = rotation_angle;
         // request_queue->file_name = entry->d_name;
     }
-    // typedef struct packet {
-    //     unsigned char operation : 4;
-    //     unsigned char flags : 4;
-    //     unsigned int size;
-    //     unsigned char checksum[SHA256_BLOCK_SIZE];
-    // } packet_t; 
 
     // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
     packet_t packet;
     packet.operation = IMG_OP_ROTATE;
-    packet.flags = IMG_FLAG_ROTATE_180; // TODO: Change this to the correct flag using the rotation angle
+    // Find IMG_FLAG_ROTATE_XXX using the rotation angle
+    if(rotation_angle == 180){
+        packet.flags = IMG_FLAG_ROTATE_180;
+    }
+    else if(rotation_angle == 270){
+        packet.flags = IMG_FLAG_ROTATE_270;
+    }
+    else{
+        packet.flags = 0;
+    }
     packet.size = sizeof(request_t);
     // packet.checksum???
-    // Indicates that the packet contains a checksum for the image
-    // The checksum will be a 32 bytes Char digest of the image data
+    // "Indicates that the packet contains a checksum for the image
+    // The checksum will be a 32 bytes Char digest of the image data"
 
     // Send the packet   
     send(sockfd, &packet, sizeof(packet), 0);

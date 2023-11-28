@@ -14,7 +14,6 @@ void *clientHandler(void *socket) {
 
     // Receive packets from the client
 
-
     // Determine the packet operatation and flags
 
     // Receive the image data using the size
