@@ -11,14 +11,22 @@
 
 
 void *clientHandler(void *socket) {
-
 ///// Receive packets from the client
-
+    int conn_fd = *(int *) socket;
+    char buffer[BUFFER_SIZE];
+    bzero(buffer, BUFFER_SIZE);
+    recv(conn_fd, buffer, BUFFER_SIZE, 0);
+    
 ///// Determine the packet operatation and flags
 
 ///// Receive the image data using the size
 
 ///// Process the image data based on the set of flags
+
+    // typedef struct processing_args {
+    //     int number_worker;
+    //     char *file_name;
+    // } processing_args_t;
 
 ///// Acknowledge the request and return the processed image data
 }
@@ -49,6 +57,12 @@ int main(int argc, char* argv[]) {
         perror("listen error");
 
 ///// Accept connections and create the client handling threads
+    struct sockaddr_in clientaddr;
+    socklen_t clientaddr_len = sizeof(clientaddr);
+    conn_fd = accept(listen_fd, (struct sockaddr *) &clientaddr, &clientaddr_len);
+    if(conn_fd == -1)
+        perror("accept error");
+
     // Spawn a client handling thread
     pthread_t client_thread;
     pthread_create(&client_thread, NULL, clientHandler, (void *) &conn_fd);
@@ -57,17 +71,6 @@ int main(int argc, char* argv[]) {
 // ○ Close the Connection: After receiving IMG_OP_EXIT operation
 // message from client, close the connection and clean up resources.
 
-
-    // struct sockaddr_in clientaddr;
-    // socklen_t clientaddr_len = sizeof(clientaddr);
-    // conn_fd = accept(listen_fd, (struct sockaddr *) &clientaddr, &clientaddr_len);
-    // if(conn_fd == -1)
-    //     perror("accept error");
-
-    // typedef struct processing_args {
-    //     int number_worker;
-    //     char *file_name;
-    // } processing_args_t;
 
 ///// Release any resources
 
