@@ -63,12 +63,12 @@ int main(int argc, char* argv[]) {
     // Create a request queue
     request_t request_queue[MAX_QUEUE_LEN];
 
-    // Set up socket
+////// Set up socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if(sockfd == INVALID)
         perror("socket error");
 
-    // Connect the socket
+////// Connect the socket
     struct sockaddr_in servaddr;
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
     if(ret == INVALID)
         perror("connect error");
 
-    // Read the directory for all the images to rotate
+///// Read the directory for all the images to rotate
     DIR* dir = opendir(image_dir);
     struct dirent* entry;
 
@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
         queue_size++;
     }
 
+///// Send the image data to the server
     while(queue_size > 0){
         // Pop a file from the queue
         request_t request = request_queue[queue_size - 1];
@@ -127,9 +128,9 @@ int main(int argc, char* argv[]) {
         packet_t response;
         recv(sockfd, &response, sizeof(response), 0);
         
-        // Check that the response packet is valid
+////// Check that the response packet is valid
         if(response.operation == IMG_OP_ACK){
-            // Receive the processed image data
+////// Receive the processed image and save it in the output dir
             receive_file(sockfd, done_img);
         }
         else if(response.operation == IMG_OP_NAK){
@@ -147,10 +148,14 @@ int main(int argc, char* argv[]) {
             // Receive the response packet containing the processed image from the server
             // Save the image to the output directory
     // While request queue is empty
-    // Send ‘terminate’ message through socket
-    // Terminate the connection once all images have been processed
+    // Send ‘terminate’ message through socket using the IMG_OP_EXIT operation
+    if (send(sockfd, IMG_OP_EXIT, strlen(IMG_OP_EXIT), 0) == INVALID) {
+        perror("terminate error");
+    }
+
+///// Terminate the connection once all images have been processed
     close(sockfd);
-    // Release any resources
+///// Release any resources
     closedir(dir);
 
     return 0;
