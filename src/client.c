@@ -1,5 +1,7 @@
-//  valgrind --tool=helgrind ./image_rotation 
-// time ./image_rotation 
+// TODO: 
+// Send a package with IMG_OP_ROTATE to the server and receive the package on the server side
+// Utilize the request queue to send the images to the server
+// Used labs as a reference for the client code
 
 
 #include <stdio.h>
@@ -18,6 +20,7 @@ int send_file(int socket, const char *filename) {
     FILE* fileptr = fopen(filename, "r");
     // Set up the request packet for the server and send it
     char buffer[BUFFER_SIZE];
+    bzero(buffer, BUFFER_SIZE);
     // Send the file data
     while(fgets(buffer, BUFFER_SIZE, fileptr) != NULL){
         send(socket, buffer, BUFFER_SIZE, 0);
@@ -33,6 +36,7 @@ int receive_file(int socket, const char *filename) {
     FILE* fileptr = fopen(filename, "w");
     // Receive response packet
     char buffer[BUFFER_SIZE];
+    bzero(buffer, BUFFER_SIZE);
     // Receive the file data
     while(recv(socket, buffer, BUFFER_SIZE, 0) > 0){
         // Write the data to the file
