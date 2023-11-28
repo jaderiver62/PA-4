@@ -55,6 +55,11 @@ int main(int argc, char* argv[]) {
     // conn_fd = accept(listen_fd, (struct sockaddr *) &clientaddr, &clientaddr_len);
     // if(conn_fd == -1)
     //     perror("accept error");
+    
+    // typedef struct processing_args {
+    //     int number_worker;
+    //     char *file_name;
+    // } processing_args_t;
 
     // Release any resources
 

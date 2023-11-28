@@ -92,47 +92,46 @@ int main(int argc, char* argv[]) {
         // Add to the request queue using the request_t struct-> rotation angle and file name
         // request_queue->rotation_angle = rotation_angle;
         // request_queue->file_name = entry->d_name;
+            // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
+        packet_t packet;
+        packet.operation = IMG_OP_ROTATE;
+        // Find IMG_FLAG_ROTATE_XXX using the rotation angle
+        if(rotation_angle == 180){
+            packet.flags = IMG_FLAG_ROTATE_180;
+        }
+        else if(rotation_angle == 270){
+            packet.flags = IMG_FLAG_ROTATE_270;
+        }
+        else{
+            packet.flags = 0;
+        }
+        packet.size = sizeof(request_t);
+        // packet.checksum???
+
+        // Send the packet   
+        send(sockfd, &packet, sizeof(packet), 0);
+
+        // Send the image file
+        send_file(sockfd, entry->d_name);
+
+        // Receive the response packet
+        packet_t response;
+        recv(sockfd, &response, sizeof(response), 0);
+        
+        // Check that the response packet is valid
+        if(response.operation == IMG_OP_ACK){
+            // Receive the processed image data
+            receive_file(sockfd, output_dir);
+        }
+        else if(response.operation == IMG_OP_NAK){
+            // Log the error
+            FILE* fileptr = fopen("request_log", "w");
+            fprintf(fileptr, "Error: %s\n", strerror(errno));
+            fclose(fileptr);
+        }
+
     }
 
-    // Send a packet with the IMG_FLAG_ROTATE_XXX message header desired rotation Angle, Image size, and data.
-    packet_t packet;
-    packet.operation = IMG_OP_ROTATE;
-    // Find IMG_FLAG_ROTATE_XXX using the rotation angle
-    if(rotation_angle == 180){
-        packet.flags = IMG_FLAG_ROTATE_180;
-    }
-    else if(rotation_angle == 270){
-        packet.flags = IMG_FLAG_ROTATE_270;
-    }
-    else{
-        packet.flags = 0;
-    }
-    packet.size = sizeof(request_t);
-    // packet.checksum???
-    // "Indicates that the packet contains a checksum for the image
-    // The checksum will be a 32 bytes Char digest of the image data"
-
-    // Send the packet   
-    send(sockfd, &packet, sizeof(packet), 0);
-
-    // Send the image data
-    send_file(sockfd, argv[1]);
-
-    // Receive the response packet
-    packet_t response;
-    recv(sockfd, &response, sizeof(response), 0);
-    
-    // Check that the response packet is valid
-    if(response.operation == IMG_OP_ACK){
-        // Receive the processed image data
-        receive_file(sockfd, argv[2]);
-    }
-    else if(response.operation == IMG_OP_NAK){
-        // Log the error
-        FILE* fileptr = fopen("request_log", "w");
-        fprintf(fileptr, "Error: %s\n", strerror(errno));
-        fclose(fileptr);
-    }
 
     // While request queue is not empty
         // Pop a file from the queue
