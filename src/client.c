@@ -73,14 +73,24 @@ int main(int argc, char* argv[]) {
     struct dirent* entry;
     // Check that the request was acknowledged
     while((entry = readdir(dir)) != NULL){
-        // Send the image to the server
-        send_file(sockfd, entry->d_name);
+        // Put the files into the request queue along with rotation angle
+
     }
-    // Receive the processed image and save it in the output dir
+    // While the queue is not empty
+    // Pop a file from the queue
+    // Send a packet with the IMG_FLAG_ROTATE_XXX message header, desired rotation Angle, Image size, and data.
+
+    // send_file(sockfd, entry->d_name);
+
+    // Receive the response packet containing the processed image from the server.
     int ret = receive_file(sockfd, argv[2]);
     if(ret == -1)
         perror("receive error");
+    // Save the image to a specified directory (e.g., 'output').
+
+    // When queue is empty
     // Terminate the connection once all images have been processed
+    // Send ‘terminate’ message through socket.
     close(sockfd);
     // Release any resources
     closedir(dir);
