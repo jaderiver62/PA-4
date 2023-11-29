@@ -23,11 +23,15 @@ int send_file(int socket, const char *filename) {
 ///// Set up the request packet for the server and send it
     char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
-
+    int bytes_read = 0;
 ///// Send the file data
-    while(fgets(buffer, BUFFER_SIZE, fileptr) != NULL){
-        send(socket, buffer, BUFFER_SIZE, 0);
+    while((bytes_read = fread(buffer, 1, BUFFER_SIZE, fileptr)) > 0) {
+        if (send(socket, buffer, bytes_read, 0) < 0) {
+            perror("Failed to send in send_file");
+            break;
+        }
     }
+
     // Close the file
     fclose(fileptr);
 
@@ -37,15 +41,15 @@ int send_file(int socket, const char *filename) {
 int receive_file(int socket, const char *filename) {
 ///// Open the file
     FILE* fileptr = fopen(filename, "w");
-
+    int bytes_read = 0;
 ///// Receive response packet
     char buffer[BUFFER_SIZE];
     bzero(buffer, BUFFER_SIZE);
 
 ///// Receive the file data
-    while(recv(socket, buffer, BUFFER_SIZE, 0) > 0){
+    while(bytes_read = recv(socket, buffer, BUFFER_SIZE, 0) > 0){
         // Write the data to the file
-        fputs(buffer, fileptr);
+        fwrite(buffer, 1, bytes_read, fileptr);
     }
     // Close the file
     fclose(fileptr);

@@ -28,6 +28,9 @@ void *clientHandler(void *socket) {
     // } packet_t; 
 
 ///// Determine the packet operatation and flags
+    int operation = packet.operation;
+    int flags = packet.flags;
+
 
 ///// Receive the image data using the size
 
@@ -79,6 +82,21 @@ int main(int argc, char* argv[]) {
     pthread_create(&client_thread, NULL, clientHandler, (void *) &conn_fd);
 
 ///// After receiving IMG_OP_EXIT operation message from client, close the connection and clean up resources.
+    packet_t packet;
+    int bytes_read;
+
+    bytes_read = recv(conn_fd, &packet, BUFFER_SIZE, 0);
+    if(bytes_read <= 0)
+        perror("recv error");
+    
+    
+
+    // typedef struct packet {
+    //     unsigned char operation : 4;
+    //     unsigned char flags : 4;
+    //     unsigned int size;
+    //     unsigned char checksum[SHA256_BLOCK_SIZE];
+    // } packet_t;
 
 
 ///// Release any resources
