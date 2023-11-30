@@ -15,33 +15,85 @@ void *clientHandler(void *socket) {
     packet_t packet;
     int conn_fd = *(int *) socket;
     int bytes_read;
+    unsigned char *image_data;
+    image_data = malloc(packet.size);
+    if (image_data == NULL) {
+        perror("malloc error");
+        // Handle errors
+        return;
+    }
 
     bytes_read = recv(conn_fd, &packet, BUFFER_SIZE, 0);
     if(bytes_read <= 0)
         perror("recv error");
 
-    // typedef struct packet {
-    //     unsigned char operation : 4;
-    //     unsigned char flags : 4;
-    //     unsigned int size;
-    //     unsigned char checksum[SHA256_BLOCK_SIZE];
-    // } packet_t; 
+    int bytes_read;
+    bytes_read = recv(conn_fd, &packet, BUFFER_SIZE, 0);
+    if(bytes_read <= 0)
+        perror("recv error");
 
-///// Determine the packet operatation and flags
+///// Determine the packet operation and flags
     int operation = packet.operation;
     int flags = packet.flags;
+    int size = packet.size;
+    char *checksum = packet.checksum;
 
+    if(operation == IMG_OP_EXIT) {
+        // Close the connection
+        close(conn_fd);
+        // Clean up resources
+        return NULL;
+    }
+    else if(operation == IMG_OP_ROTATE) {
+        // Rotate the image
 
 ///// Receive the image data using the size
+        bytes_read = recv(conn_fd, image_data, packet.size, 0);
+        if (bytes_read <= 0) {
+            // Handle errors and free memory
+            // Send back the package with an IMG_OP_NAK message if an error happens. Skip the rest of the job for this image.
+            free(image_data);
+            return;
+        }
 
 ///// Process the image data based on the set of flags - ROTATE THE IMAGE
+        if(flags == IMG_FLAG_ROTATE_180) {
+            // Rotate 180
+        }
+        else if(flags == IMG_FLAG_ROTATE_270) {
+            // Rotate 270
+        }
+        else {
+            // Error
+        }
+    }
+    else {
+        // Invalid operation
+    }
 
 ///// Acknowledge the request and return the processed image data
+    packet_t response;
+    response.operation = IMG_OP_ACK;
+    response.flags = 0;
+    response.size = 0;
+    memset(response.checksum, 0, SHA256_BLOCK_SIZE);
 
-    // typedef struct processing_args {
-    //     int number_worker;
-    //     char *file_name;
-    // } processing_args_t;
+    // Send the response packet
+    if(send(conn_fd, &response, sizeof(response), 0) < 0) {
+        perror("send error");
+        // Handle errors
+        return;
+    }
+
+    // Send the processed image data
+    if(send(conn_fd, image_data, packet.size, 0) < 0) {
+        perror("send error");
+        // Handle errors
+        return;
+    }
+
+    // Free the image data
+    free(image_data);
 
 }
 
@@ -82,21 +134,6 @@ int main(int argc, char* argv[]) {
     pthread_create(&client_thread, NULL, clientHandler, (void *) &conn_fd);
 
 ///// After receiving IMG_OP_EXIT operation message from client, close the connection and clean up resources.
-    packet_t packet;
-    int bytes_read;
-
-    bytes_read = recv(conn_fd, &packet, BUFFER_SIZE, 0);
-    if(bytes_read <= 0)
-        perror("recv error");
-    
-    
-
-    // typedef struct packet {
-    //     unsigned char operation : 4;
-    //     unsigned char flags : 4;
-    //     unsigned int size;
-    //     unsigned char checksum[SHA256_BLOCK_SIZE];
-    // } packet_t;
 
 
 ///// Release any resources
